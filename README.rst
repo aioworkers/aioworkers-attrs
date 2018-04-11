@@ -17,6 +17,10 @@ mymodule.py:
       def set_default_c(self):
           return self.config.get('c', 0)
 
+      async def init(self):
+          x = self.c
+          # do something
+
 
 conf.yaml:
 
