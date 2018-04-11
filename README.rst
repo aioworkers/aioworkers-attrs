@@ -29,9 +29,17 @@ conf.yaml:
 
 run:
 
-    aioworkers -i -c conf.yaml
+.. code-block:: bash
 
-    > from aioworkers_attrs import attr
-    > attr.asdict(context.a)
-    {'c': 1}
+  aioworkers -i -c conf.yaml
 
+
+and type:
+
+.. code-block:: python
+
+  > from aioworkers_attrs import attr
+
+  > attr.asdict(context.a)
+
+  {'c': 1}
