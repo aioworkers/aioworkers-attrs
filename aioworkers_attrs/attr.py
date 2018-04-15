@@ -7,17 +7,27 @@ from aioworkers.core.base import AbstractEntity
 
 
 @attr.s
-class _Entity:
-    _config = attr.ib(repr=False,)
+class _Signature:
+    _config = attr.ib(repr=False)
     _context = attr.ib(repr=False)
-    _loop = attr.ib(repr=False)
+    _loop = attr.ib(repr=False, default=attr.Factory(asyncio.get_event_loop))
 
-    @_loop.default
-    def default_event_loop(self):
-        return asyncio.get_event_loop()
 
-@attr.s
-class _AsyncInit:
+class _Entity:
+    @property
+    def config(self):
+        return self._config
+
+    @property
+    def context(self):
+        return self._context
+
+    def __attrs_post_init__(self):
+        if hasattr(self, 'start'):
+            self._context.on_start.append(self.start)
+        if hasattr(self, 'stop'):
+            self._context.on_stop.append(self.stop)
+
     async def init(self):
         pass
 
@@ -29,7 +39,7 @@ def entity(cls):
     for k, v in cls.__dict__.items():
         if hasattr(v, 'init') and isinstance(v.init, bool):
             v.init = False
-    result = attr.make_class(cls.__name__, (), bases=(_Entity, attr.s(cls), _AsyncInit))
+    result = attr.make_class(cls.__name__, (), bases=(_Signature, attr.s(cls), _Entity))
     return functools.wraps(cls, updated=())(result)
 
 
